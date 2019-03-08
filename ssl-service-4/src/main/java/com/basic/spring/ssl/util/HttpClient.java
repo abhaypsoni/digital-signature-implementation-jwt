@@ -30,51 +30,33 @@ public class HttpClient implements CommandLineRunner {
 	@Autowired
 	private RestTemplate template;
 
-	@Autowired
-	RsaExample rsaEg;
-	
+	/*
+	 * @Autowired RSAUtility rsaEg;
+	 */
+
 	@Autowired
 	KeysUtil keysUtil;
-	
+
 	@Autowired
 	Environment environment;
-	
+
 	@Autowired
-	RsaExample rsaUtility;
-	
+	RSAUtilitySSL4 rsaUtility;
 
 	@Override
 	public void run(String... args) throws Exception {
 		System.out.println("--------------------------Calling service 3 from service 4------------------------");
 
-		String requestBody = rsaEg.getRequestBody();
-		System.out.println("the request body is:"+requestBody);
+		String requestBody = rsaUtility.getRequestBody();
+		System.out.println("the request body is:" + requestBody);
 		HttpHeaders headers = createHttpHeaders(requestBody);
-		HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
+		 HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
+	//	HttpEntity<String> entity = new HttpEntity<String>("", headers);
 		String url = "http://localhost:8081/service3";
-		System.out.println("URL is:"+url);
+		System.out.println("URL is:" + url);
 		ResponseEntity<String> response = template.exchange(url, HttpMethod.GET, entity, String.class);
-		
-		System.out.println(response.getBody());
-	/*	List<String> list = entity.getHeaders().get("Authorization");
-		System.out.println("The list is"+list.get(0));
-		list.get(0);
-		String[] split = list.get(0).split(":");
-		System.out.println("Value in the key is:"+split[1]);
-		
-		JWSObject jwsObjectNew = JWSObject.parse(split[1]);
 
-		
-		
-		RSAPrivateKey privKey = rsaUtility.getRSAPrivateKey();
-		RSAPrivateCrtKey rsaPrivateCrtKey =rsaUtility.getRSAPrivateCrtKey(privKey);
-		System.out.println("rsaPrivateKey is:" + privKey);
-		PublicKey publicKey = rsaUtility.getPublicKey(rsaPrivateCrtKey);
-		
-		
-		JWSVerifier verifier = new RSASSAVerifier((RSAPublicKey) publicKey);
-		System.out.println(jwsObjectNew.verify(verifier));
-		System.out.println(jwsObjectNew.getPayload().toString());*/
+		System.out.println(response.getBody());
 		System.out.println(response.getStatusCodeValue());
 	}
 
