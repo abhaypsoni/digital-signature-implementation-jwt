@@ -12,8 +12,6 @@ import org.springframework.stereotype.Component;
 import com.google.gson.Gson;
 import com.nimbusds.jose.JWSObject;
 
-import net.minidev.json.JSONObject;
-
 @Component
 public class RSAUtilitySSL4 {
 	@Autowired
@@ -26,7 +24,7 @@ public class RSAUtilitySSL4 {
 	Environment environment;
 
 	public String getRequestBody() {
-		
+
 		RSAPrivateKey privKey = getRSAPrivateKey();
 		RSAPrivateCrtKey rsaPrivateCrtKey = getRSAPrivateCrtKey(privKey);
 
@@ -34,17 +32,17 @@ public class RSAUtilitySSL4 {
 
 		PublicKey publicKey = getPublicKey(rsaPrivateCrtKey);
 
-		System.out.println("----Printing the priv key file---------");
-
 		System.out.println("----Printing the public key file---------");
 		System.out.println(publicKey);
 
 		String hashBankPublicKey = JWSUtil.computeHashfromPublicKey(publicKey);
-		System.out.println("----hash Bank Public key---------");
+		System.out.println("----Printing hash Bank Public key---------");
 
 		System.out.println(hashBankPublicKey);
 
+		//Message to be encoded/payload
 		String message = "Some message";
+		
 		Gson gson = new Gson();
 		byte[] data = gson.toJson(message).getBytes();
 		System.out.println(data);
@@ -53,14 +51,15 @@ public class RSAUtilitySSL4 {
 
 		String requestdata = jwsObject.serialize();
 
-		/*JSONObject jwsObj = new JSONObject();
-
-		jwsObj.put("jws", requestdata);
-		return jwsObj.toString();*/
+		/*
+		 * JSONObject jwsObj = new JSONObject();
+		 * 
+		 * jwsObj.put("jws", requestdata); return jwsObj.toString();
+		 */
 		return requestdata;
 	}
 
-	public RSAPrivateKey getRSAPrivateKey(){
+	public RSAPrivateKey getRSAPrivateKey() {
 		String fileName = environment.getProperty("hyperledger.private.key");
 
 		System.out.println("filename is::" + fileName);
@@ -69,60 +68,16 @@ public class RSAUtilitySSL4 {
 		RSAPrivateKey privKey = keysUtil.getPemPrivateKey(privKeyFile);
 		return privKey;
 	}
+
 	public RSAPrivateCrtKey getRSAPrivateCrtKey(RSAPrivateKey privKey) {
-		
 
 		RSAPrivateCrtKey rsaPrivateKey = (RSAPrivateCrtKey) privKey;
 		return rsaPrivateKey;
 	}
-	
-	public PublicKey getPublicKey(RSAPrivateCrtKey rsaPrivateKey){
+
+	public PublicKey getPublicKey(RSAPrivateCrtKey rsaPrivateKey) {
 		PublicKey publicKey = keysUtil.getPemPublicKey(rsaPrivateKey);
 		return publicKey;
 
 	}
-
-	/*
-	 * public static void main(String args[]) throws Exception {
-	 * 
-	 * KeysUtil keysUtil = new KeysUtil(); JWSUtil JWSUtil = new JWSUtil();
-	 * 
-	 * File privKeyFile = keysUtil.loadKeyFile("key.pem");
-	 * 
-	 * RSAPrivateKey privKey = keysUtil.getPemPrivateKey(privKeyFile);
-	 * RSAPrivateCrtKey rsaPrivateKey = (RSAPrivateCrtKey) privKey; PublicKey
-	 * publicKey = keysUtil.getPemPublicKey(rsaPrivateKey);
-	 * 
-	 * System.out.println("----Printing the priv key file---------");
-	 * System.out.println(privKey);
-	 * 
-	 * System.out.println("----Printing the priv key file---------");
-	 * System.out.println(publicKey);
-	 * 
-	 * String hashBankPublicKey = JWSUtil.computeHashfromPublicKey(publicKey);
-	 * System.out.println("----hash Bank Public key---------");
-	 * 
-	 * System.out.println(hashBankPublicKey);
-	 * 
-	 * String message = "Some message"; Gson gson = new Gson(); byte[] data =
-	 * gson.toJson(message).getBytes(); System.out.println(data);
-	 * 
-	 * JWSObject jwsObject = JWSUtil.signJWSwithRSA(data, publicKey, privKey);
-	 * 
-	 * String requestdata = jwsObject.serialize();
-	 * 
-	 * JSONObject jwsObj = new JSONObject();
-	 * 
-	 * jwsObj.put("jws", requestdata);
-	 * 
-	 * //For decryption
-	 * 
-	 * JWSObject jwsObjectNew = JWSObject.parse(jwsObj.getAsString("jws"));
-	 * 
-	 * JWSVerifier verifier = new RSASSAVerifier((RSAPublicKey) publicKey);
-	 * System.out.println(jwsObjectNew.verify(verifier));
-	 * System.out.println(jwsObjectNew.getPayload().toString());
-	 * 
-	 * }
-	 */
 }
